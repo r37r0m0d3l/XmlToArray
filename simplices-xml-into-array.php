@@ -100,7 +100,7 @@ class Simplices_XML_into_Array {
 					$current = &$current [$xml_tag ['tag']] [$last_item_index];
 				}
 			} elseif ($xml_tag ['type'] == 'complete') {
-				if (! isset ( $current [$xml_tag ['tag']] )) {
+				if (! isset ( $current [$xml_tag ['tag']] ) and empty ( $current ['@'.$xml_tag ['tag']] ) ) {
 					$current [$xml_tag ['tag']] = $result;
 					$repeated_tag_index [$xml_tag ['tag'] . '_' . $xml_tag ['level']] = 1;
 					if ($tag_priority and $attributes_data) {
