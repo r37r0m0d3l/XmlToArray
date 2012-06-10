@@ -51,9 +51,6 @@ class xml_into_array
 		$xml_array = array();
 		$current = &$xml_array;
 		$repeated_tag_index = array();
-		echo '<pre>';
-		print_r($xml_values);
-		echo '</pre>';
 		foreach ($xml_values as $num=> $xml_tag):
 			$result = null;
 			$attributes_data = null;
