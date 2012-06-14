@@ -2,6 +2,7 @@
 /**
  * An easy way to convert XML to PHP array
  * @link https://github.com/P54l0m5h1k/XML-to-array
+ * @link twin brother: https://github.com/P54l0m5h1k/Array_to_XML
  */
 class xml_into_array
 {
