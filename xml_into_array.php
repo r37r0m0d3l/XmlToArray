@@ -1,29 +1,11 @@
 <?php
 /**
- * An easy way to convert XML to PHP array
- * @link https://github.com/P54l0m5h1k/XML-to-array
- * @link twin brother: https://github.com/P54l0m5h1k/Array_to_XML
+ * an easy way to convert xml to php array
+ * @link https://github.com/P54l0m5h1k/xml_to_array
+ * @link https://github.com/P54l0m5h1k/array_to_xml - twin brother
  */
 class xml_into_array
 {
-	/**
-	 * Very simple parsing. Returns either the tag or attribute.
-	 * @static
-	 * @param string $xml     string containing XML
-	 * @param bool   $recurse flag of a recursive function call
-	 * @return array|null|SimpleXMLElement
-	 */
-	public static function xml_2_array($xml, $recurse = false)
-	{
-		$data = ((!$recurse) and is_string($xml)) ? simplexml_load_string($xml) : $xml;
-		if ($data instanceof \SimpleXMLElement)
-			$data = (array)$data;
-		if (is_array($data))
-			foreach ($data as &$item)
-				$item = self::xml_2_array($item, true);
-		return is_array($data) and count($data) == 0 ? null : $data;
-	}
-
 	/**
 	 * Parsing XML into array.
 	 * @static

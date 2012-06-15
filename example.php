@@ -7,15 +7,6 @@ $xml = '<?xml version="1.0" encoding="utf-8"?>
 	<extra2>2222</extra2>
 	<extra3>3333</extra3>
 </data>';
-# Only useful tags
-$array = xml_into_array::xml_2_array($xml);
-/*
-array(
-	'extra1'  => 1111,
-	'extra2' => 2222,
-	'extra3' => 3333,
-)
-*/
 # Full parsing, array have root element
 $array = xml_into_array::xml_to_array($xml);
 /*
@@ -36,24 +27,6 @@ $xml = '<?xml version="1.0" encoding="utf-8"?>
 	<extra>2222</extra>
 	<extra>3333</extra>
 </data>';
-# Quick parsing again
-$array = xml_into_array::xml_2_array($xml);
-/*
-array(
-	'id' => 1001,
-	'info' => array(
-		'@attributes' => array(
-			'att1' => 'one',
-			'att2' => 'two',
-		),
-	),
-	'extra' => array(
-		0 => 1111,
-		1 => 2222,
-		2 => 3333,
-	),
-)
-*/
 # More informative array
 $array = xml_into_array::xml_to_array($xml);
 /*
