@@ -1,8 +1,8 @@
 <?php
 /**
  * an easy way to convert xml to php array
- * @link https://github.com/P54l0m5h1k/xml_to_array
- * @link https://github.com/P54l0m5h1k/array_to_xml - twin brother
+ * @link https://github.com/P54l0m5h1k/XML-to-Array-PHP/
+ * @link https://github.com/P54l0m5h1k/Array-to-XML-PHP/ - twin brother
  */
 class xml_into_array
 {
