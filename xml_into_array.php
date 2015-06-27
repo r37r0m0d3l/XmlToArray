@@ -1,4 +1,5 @@
 <?php
+
 /**
  * an easy way to convert xml to php array
  * @link https://github.com/P54l0m5h1k/XML-to-Array-PHP/
@@ -9,119 +10,128 @@ class xml_into_array
 	/**
 	 * Parsing XML into array.
 	 * @static
-	 * @param string $contents     string containing XML
-	 * @param bool   $get_attributes
-	 * @param bool   $tag_priority priority of values in the array - `true` if the higher priority in the tag, `false` if only the attributes needed
+	 * @param string $contents string containing XML
+	 * @param bool $getAttributes
+	 * @param bool $tagPriority priority of values in the array - `true` if the higher priority in the tag, `false` if only the attributes needed
+	 * @param string $encoding target XML encoding
 	 * @return array
 	 */
-	public static function xml_to_array($contents, $get_attributes = true, $tag_priority = true)
+	public static function xml_to_array($contents, $getAttributes = true, $tagPriority = true, $encoding = 'utf-8')
 	{
 		$contents = trim($contents);
-		if (empty ($contents))
-			return array();
+		if (empty ($contents)) {
+			return [];
+		}
 		$parser = xml_parser_create('');
-		xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, 'utf-8');
+		xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, $encoding);
 		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
 		xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
-		if (xml_parse_into_struct($parser, $contents, $xml_values) == 0):
+		if (xml_parse_into_struct($parser, $contents, $xmlValues) === 0) {
 			xml_parser_free($parser);
-			return array();
-		endif;
+			return [];
+		}
 		xml_parser_free($parser);
-		if (!$xml_values)
-			return array();
+		if (empty($xmlValues)) {
+			return [];
+		}
 		unset($contents, $parser);
-		$xml_array = array();
-		$current = &$xml_array;
-		$repeated_tag_index = array();
-		foreach ($xml_values as $num=> $xml_tag):
+		$xmlArray = [];
+		$current = &$xmlArray;
+		$repeatedTagIndex = [];
+		foreach ($xmlValues as $num => $xmlTag) {
 			$result = null;
-			$attributes_data = null;
-			if (isset ($xml_tag['value']))
-				if ($tag_priority)
-					$result = $xml_tag['value'];
-				else
-					$result['value'] = $xml_tag['value'];
-			if (isset ($xml_tag['attributes']) and $get_attributes)
-				foreach ($xml_tag['attributes'] as $attr => $val)
-					if ($tag_priority)
-						$attributes_data[$attr] = $val;
-					else
+			$attributesData = null;
+			if (isset ($xmlTag['value'])) {
+				if ($tagPriority) {
+					$result = $xmlTag['value'];
+				} else {
+					$result['value'] = $xmlTag['value'];
+				}
+			}
+			if (isset ($xmlTag['attributes']) and $getAttributes) {
+				foreach ($xmlTag['attributes'] as $attr => $val) {
+					if ($tagPriority) {
+						$attributesData[$attr] = $val;
+					} else {
 						$result['@attributes'][$attr] = $val;
-			if ($xml_tag['type'] == 'open'):
-				$parent[$xml_tag['level'] - 1] = &$current;
-				if (!is_array($current) or (!in_array($xml_tag['tag'], array_keys($current)))):
-					$current[$xml_tag['tag']] = $result;
+					}
+				}
+			}
+			if ($xmlTag['type'] == 'open') {
+				$parent[$xmlTag['level'] - 1] = &$current;
+				if (!is_array($current) or (!in_array($xmlTag['tag'], array_keys($current)))) {
+					$current[$xmlTag['tag']] = $result;
 					unset($result);
-					if ($attributes_data)
-						$current['@'.$xml_tag['tag']] = $attributes_data;
-					$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']] = 1;
-					$current = &$current[$xml_tag['tag']];
-				else:
-					if (isset ($current[$xml_tag['tag']]['0'])):
-						$current[$xml_tag['tag']][$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']]] = $result;
+					if ($attributesData) {
+						$current['@'.$xmlTag['tag']] = $attributesData;
+					}
+					$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']] = 1;
+					$current = &$current[$xmlTag['tag']];
+				} else {
+					if (isset ($current[$xmlTag['tag']]['0'])) {
+						$current[$xmlTag['tag']][$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']]] = $result;
 						unset($result);
-						if ($attributes_data)
-							if (isset ($repeated_tag_index['@'.$xml_tag['tag'].'_'.$xml_tag['level']]))
-								$current[$xml_tag['tag']][$repeated_tag_index['@'.$xml_tag['tag'].'_'.$xml_tag['level']]] = $attributes_data;
-						$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']]++;
-					else:
-						$current[$xml_tag['tag']] = array(
-							$current[$xml_tag['tag']],
+						if ($attributesData) {
+							if (isset ($repeatedTagIndex['@'.$xmlTag['tag'].'_'.$xmlTag['level']])) {
+								$current[$xmlTag['tag']][$repeatedTagIndex['@'.$xmlTag['tag'].'_'.$xmlTag['level']]] = $attributesData;
+							}
+						}
+						$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']] += 1;
+					} else {
+						$current[$xmlTag['tag']] = [$current[$xmlTag['tag']], $result];
+						unset($result);
+						$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']] = 2;
+						if (isset ($current['@'.$xmlTag['tag']])) {
+							$current[$xmlTag['tag']]['@0'] = $current['@'.$xmlTag['tag']];
+							unset ($current['@'.$xmlTag['tag']]);
+						}
+						if ($attributesData) {
+							$current[$xmlTag['tag']]['@1'] = $attributesData;
+						}
+					}
+					$lastItemIndex = $repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']] - 1;
+					$current = &$current[$xmlTag['tag']][$lastItemIndex];
+				}
+			} elseif ($xmlTag['type'] == 'complete') {
+				if (!isset ($current[$xmlTag['tag']]) and empty ($current['@'.$xmlTag['tag']])) {
+					$current[$xmlTag['tag']] = $result;
+					unset($result);
+					$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']] = 1;
+					if ($tagPriority and $attributesData) {
+						$current['@'.$xmlTag['tag']] = $attributesData;
+					}
+				} else {
+					if (isset ($current[$xmlTag['tag']]['0']) and is_array($current[$xmlTag['tag']])) {
+						$current[$xmlTag['tag']][$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']]] = $result;
+						unset($result);
+						if ($tagPriority and $getAttributes and $attributesData) {
+							$current[$xmlTag['tag']]['@'.$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']]] = $attributesData;
+						}
+						$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']] += 1;
+					} else {
+						$current[$xmlTag['tag']] = array(
+							$current[$xmlTag['tag']],
 							$result
 						);
 						unset($result);
-						$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']] = 2;
-						if (isset ($current['@'.$xml_tag['tag']])):
-							$current[$xml_tag['tag']]['@0'] = $current['@'.$xml_tag['tag']];
-							unset ($current['@'.$xml_tag['tag']]);
-						endif;
-						if ($attributes_data)
-							$current[$xml_tag['tag']]['@1'] = $attributes_data;
-					endif;
-					$last_item_index = $repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']] - 1;
-					$current = &$current[$xml_tag['tag']][$last_item_index];
-				endif;
-			elseif ($xml_tag['type'] == 'complete'):
-				if (!isset ($current[$xml_tag['tag']]) and empty ($current['@'.$xml_tag['tag']]))
-				{
-					$current[$xml_tag['tag']] = $result;
-					unset($result);
-					$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']] = 1;
-					if ($tag_priority and $attributes_data)
-						$current['@'.$xml_tag['tag']] = $attributes_data;
+						$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']] = 1;
+						if ($tagPriority and $getAttributes) {
+							if (isset ($current['@'.$xmlTag['tag']])) {
+								$current[$xmlTag['tag']]['@0'] = $current['@'.$xmlTag['tag']];
+								unset ($current['@'.$xmlTag['tag']]);
+							}
+							if ($attributesData) {
+								$current[$xmlTag['tag']]['@'.$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']]] = $attributesData;
+							}
+						}
+						$repeatedTagIndex[$xmlTag['tag'].'_'.$xmlTag['level']] += 1;
+					}
 				}
-				else
-				{
-					if (isset ($current[$xml_tag['tag']]['0']) and is_array($current[$xml_tag['tag']])):
-						$current[$xml_tag['tag']][$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']]] = $result;
-						unset($result);
-						if ($tag_priority and $get_attributes and $attributes_data)
-							$current[$xml_tag['tag']]['@'.$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']]] = $attributes_data;
-						$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']]++;
-					else:
-						$current[$xml_tag['tag']] = array(
-							$current[$xml_tag['tag']],
-							$result
-						);
-						unset($result);
-						$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']] = 1;
-						if ($tag_priority and $get_attributes):
-							if (isset ($current['@'.$xml_tag['tag']])):
-								$current[$xml_tag['tag']]['@0'] = $current['@'.$xml_tag['tag']];
-								unset ($current['@'.$xml_tag['tag']]);
-							endif;
-							if ($attributes_data)
-								$current[$xml_tag['tag']]['@'.$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']]] = $attributes_data;
-						endif;
-						$repeated_tag_index[$xml_tag['tag'].'_'.$xml_tag['level']]++;
-					endif;
-				}
-			elseif ($xml_tag['type'] == 'close'):
-				$current = &$parent[$xml_tag['level'] - 1];
-			endif;
-			unset($xml_values[$num]);
-		endforeach;
-		return $xml_array;
+			} elseif ($xmlTag['type'] == 'close') {
+				$current = &$parent[$xmlTag['level'] - 1];
+			}
+			unset($xmlValues[$num]);
+		}
+		return $xmlArray;
 	}
 }
