@@ -1,5 +1,6 @@
 <?php
-include 'xml_into_array.php';
+namespace p54l0m5h1k\XmlToArray;
+include 'XmlToArray.php';
 # Simple xml without attributes
 $xml = '<?xml version="1.0" encoding="utf-8"?>
 <data>
@@ -8,7 +9,7 @@ $xml = '<?xml version="1.0" encoding="utf-8"?>
 	<extra3>3333</extra3>
 </data>';
 # Full parsing, array have root element
-$array = xml_into_array::xml_to_array($xml);
+$array = XmlToArray::xmlToArray($xml);
 /*
 array(
 	'data' => array(
@@ -28,7 +29,7 @@ $xml = '<?xml version="1.0" encoding="utf-8"?>
 	<extra>3333</extra>
 </data>';
 # More informative array
-$array = xml_into_array::xml_to_array($xml);
+$array = XmlToArray::xmlToArray($xml);
 /*
 array(
 	'data' => array(
@@ -47,7 +48,7 @@ array(
 )
 */
 # Attributes is priority
-$array = xml_into_array::xml_to_array($xml, true, false);
+$array = XmlToArray::xmlToArray($xml, true, false);
 /*
 array(
 	'data' => array(
@@ -75,7 +76,7 @@ array(
 )
 */
 # Attributes will be omitted
-$array = xml_into_array::xml_to_array($xml, false, true);
+$array = XmlToArray::xmlToArray($xml, false, true);
 /*
 array(
 	'data' => array(
@@ -90,7 +91,7 @@ array(
 )
 */
 # Attributes will be omitted, tags will be fulfill role of attributes
-$array = xml_into_array::xml_to_array($xml, false, false);
+$array = XmlToArray::xmlToArray($xml, false, false);
 /*
 array(
 	'data' => array(
