@@ -1,11 +1,11 @@
 <?php
-namespace p54l0m5h1k\XmlToArray;
+namespace r37r0m0d3l\XmlToArray;
 
 /**
  * An easy way to convert xml to php array.
  *
- * @link https://github.com/P54l0m5h1k/XML-to-Array-PHP/
- * @link https://github.com/P54l0m5h1k/Array-to-XML-PHP/
+ * @link https://github.com/r37r0m0d3l/XML-to-Array-PHP/
+ * @link https://github.com/r37r0m0d3l/Array-to-XML-PHP/
  */
 class XmlToArray
 {
