@@ -1,5 +1,4 @@
 <?php
-namespace p54l0m5h1k\XmlToArray;
 include 'XmlToArray.php';
 # Simple xml without attributes
 $xml = '<?xml version="1.0" encoding="utf-8"?>
